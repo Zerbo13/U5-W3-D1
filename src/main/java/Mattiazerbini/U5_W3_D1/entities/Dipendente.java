@@ -1,11 +1,13 @@
 package Mattiazerbini.U5_W3_D1.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -14,7 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Dipendente {
+public class Dipendente implements UserDetails {
 
     @Id
     @GeneratedValue
@@ -26,6 +28,8 @@ public class Dipendente {
     private String cognome;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
+    private Ruolo ruolo;
 
 
     public Dipendente(String username, String nome, String cognome, String email, String password) {
@@ -34,5 +38,16 @@ public class Dipendente {
         this.cognome = cognome;
         this.email = email;
         this.password = password;
+        this.ruolo = Ruolo.IMPIEGATO;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.ruolo.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
     }
 }
