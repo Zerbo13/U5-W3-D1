@@ -10,6 +10,7 @@ import Mattiazerbini.U5_W3_D1.services.ViaggioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,21 @@ public class DipendenteController {
     @ResponseStatus(HttpStatus.CREATED) // 201
     public Dipendente createDipendente(@RequestBody DipendentePayload payload) {
         return this.dipendenteService.salvaDipendente(payload);
+    }
+
+    @GetMapping("/{userId}")
+    public Dipendente findById(@PathVariable UUID userId) {
+        return this.dipendenteService.findById(userId);
+    }
+
+    @PutMapping("/me")
+    public Dipendente updateProfile(@AuthenticationPrincipal Dipendente currentAuthenticatedUser, @RequestBody DipendentePayload payload) {
+        return this.dipendenteService.findByIdAndUpdate(currentAuthenticatedUser.getId(), payload);
+    }
+
+    @DeleteMapping("/me")
+    public void deleteProfile(@AuthenticationPrincipal Dipendente currentAuthenticatedUser) {
+        this.dipendenteService.findByIdAndDelete(currentAuthenticatedUser.getId());
     }
 
     @PreAuthorize("hasAnyAuthority('DIRIGENTE', 'IMPIEGATO')")
